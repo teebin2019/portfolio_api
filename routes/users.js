@@ -1,4 +1,6 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
 const router = express.Router();
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
@@ -40,12 +42,14 @@ router.get("/:id", async (req, res) => {
 
 // เพิ่มข้อมูล User
 router.post("/", async (req, res) => {
-  const { email, name } = req.body;
+  const { email, name, password } = req.body;
+  const hash = await bcrypt.hashSync(password, saltRounds);
   try {
     const user = await prisma.user.create({
       data: {
         email: email,
         name: name,
+        password: hash,
       },
     });
     res.status(200).json({ message: "User Created Successfully", user: user });
