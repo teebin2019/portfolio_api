@@ -36,4 +36,42 @@ router.post("/logup", async (req, res) => {
   }
 });
 
+// เข้าสู่ระบบ
+router.post("/login", async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    // เช็ค Email ว่าตรงหรือเปล่า
+    if (!user) {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+
+    // เช็ค Password ว่าตรงหรือเปล่า
+    if (bcrypt.compareSync(password, user.password)) {
+      // Create payload for JWT
+      const payload = {
+        id: user.id,
+        username: user.name,
+      };
+
+      // Sign token
+      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "1h" });
+
+      res.json({ message: "Login successful", token });
+    } else {
+      return res.status(401).json({ message: "Invalid credentials" });
+    }
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({ message: "Error" });
+  }
+});
+
 module.exports = router;
