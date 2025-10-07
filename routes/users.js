@@ -16,7 +16,7 @@ router.get("/", async (req, res) => {
     const allUsers = await prisma.user.findMany();
     res
       .status(200)
-      .json({ message: "User Select Successfully", user: allUsers });
+      .json({ message: "User Select Successfully", users: allUsers });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error" });

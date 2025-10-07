@@ -1,9 +1,13 @@
 const express = require("express");
+const cors = require("cors");
 const usersRouter = require("./routes/users");
 const authRouter = require("./routes/auth");
 
 const app = express();
 const port = 8080;
+
+// ใช้ CORS middleware แบบอนุญาตทั้งหมด
+app.use(cors());
 
 // Middleware to parse JSON request bodies
 app.use(express.json());

@@ -16,13 +16,14 @@ router.use((req, res, next) => {
 
 // เพิ่มข้อมูล User
 router.post("/logup", async (req, res) => {
-  const { email, name, password } = req.body;
+  const { email, first_name, last_name, password } = req.body;
   const hash = await bcrypt.hashSync(password, saltRounds);
   try {
     const user = await prisma.user.create({
       data: {
         email: email,
-        name: name,
+        first_name: first_name,
+        last_name: last_name,
         password: hash,
       },
     });
@@ -72,6 +73,40 @@ router.post("/login", async (req, res) => {
 
     res.status(500).json({ message: "Error" });
   }
+});
+
+// Middleware for JWT verification
+const authenticateJWT = (req, res, next) => {
+  // Get auth header - The Authorization header is commonly used to send authentication tokens
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader) {
+    return res.status(401).json({ message: "Authorization header missing" });
+  }
+
+  // Extract token from "Bearer <token>"
+  const token = authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Token missing" });
+  }
+
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // Attach user to request
+    req.user = decoded;
+
+    next();
+  } catch (error) {
+    return res.status(403).json({ message: "Invalid or expired token" });
+  }
+};
+
+// Protected route
+router.get("/profile", authenticateJWT, (req, res) => {
+  res.json({ message: "Profile accessed", user: req.user });
 });
 
 module.exports = router;
