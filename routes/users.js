@@ -1,8 +1,6 @@
 const express = require("express");
 
 const router = express.Router();
-const { PrismaClient } = require("../generated/prisma");
-const prisma = new PrismaClient();
 
 // Middleware specific to this router
 router.use((req, res, next) => {
