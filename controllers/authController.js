@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const { PrismaClient } = require("../generated/prisma");
 const prisma = new PrismaClient();
 
-const JWT_SECRET = "your-jwt-secret-key";
+const { JWT_SECRET } = require("../routes/auth");
 
 const register = async (req, res) => {
   const { email, first_name, last_name, password } = req.body;
